@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Time Together ♡</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --rose:  #C4526A;
+    --blush: #E8A0B0;
+    --deep:  #1A0A10;
+    --ink:   #2D1520;
+    --petal: #F7E8ED;
+    --gold:  #C9956C;
+    --muted: #8A5A68;
+  }
+
+  body {
+    background: var(--deep);
+    color: var(--petal);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ── Particles ── */
+  #particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .particle {
+    position: absolute; border-radius: 50%; opacity: 0;
+    animation: drift var(--d) var(--delay) ease-in-out infinite;
+    background: var(--rose); filter: blur(1px);
+  }
+  @keyframes drift {
+    0%   { transform: translateY(100vh) translateX(0) scale(0); opacity: 0; }
+    15%  { opacity: .5; }
+    85%  { opacity: .3; }
+    100% { transform: translateY(-10vh) translateX(var(--tx)) scale(.6); opacity: 0; }
+  }
+
+  /* ── Layout ── */
+  .page {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 920px;
+    padding: 3rem 1.5rem 5rem;
+    display: flex; flex-direction: column; align-items: center; gap: 3rem;
+  }
+
+  /* ── Header ── */
+  header { text-align: center; display: flex; flex-direction: column; align-items: center; gap: .6rem; }
+  .eyebrow { font-size: .73rem; letter-spacing: .25em; text-transform: uppercase; color: var(--blush); font-weight: 300; }
+  .title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.6rem, 7vw, 4.5rem); font-weight: 300; line-height: 1.05; }
+  .title em { font-style: italic; color: var(--blush); }
+  .subtitle { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.05rem; color: var(--muted); }
+
+  .heart-divider { margin-top: .8rem; display: flex; align-items: center; gap: .75rem; width: 100%; max-width: 320px; }
+  .heart-divider::before { content:''; flex:1; height:1px; background: linear-gradient(to right, transparent, var(--rose)); }
+  .heart-divider::after  { content:''; flex:1; height:1px; background: linear-gradient(to left,  transparent, var(--rose)); }
+  .hd-icon { font-size: 1rem; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.25)} }
+
+  .start-badge {
+    display: inline-flex; align-items: center; gap: .5rem;
+    background: rgba(196,82,106,.12); border: 1px solid rgba(196,82,106,.3);
+    border-radius: 999px; padding: .4rem 1.1rem; font-size: .8rem;
+    color: var(--blush); letter-spacing: .05em;
+  }
+  .start-badge span { color: var(--petal); font-weight: 500; }
+
+  /* ── Card ── */
+  .counter-card {
+    width: 100%;
+    background: linear-gradient(135deg, rgba(196,82,106,.1) 0%, rgba(26,10,16,.6) 60%);
+    border: 1px solid rgba(196,82,106,.25); border-radius: 1.5rem;
+    padding: 2.5rem 2rem 2rem;
+    display: flex; flex-direction: column; align-items: center; gap: 2rem;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 32px 80px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.04);
+  }
+
+  /* ── TOP ROW: Years · Months · Days ── */
+  .top-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    width: 100%;
+  }
+
+  /* ── MID ROW: Hours · Minutes · Seconds ── */
+  .mid-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    width: 100%;
+  }
+
+  /* ── BOTTOM ROW: Total Days · Hours · Minutes · Seconds ── */
+  .bottom-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    width: 100%;
+  }
+
+  @media (max-width: 540px) {
+    .top-row, .mid-row { grid-template-columns: repeat(3, 1fr); gap: .55rem; }
+    .bottom-row { grid-template-columns: repeat(2, 1fr); gap: .55rem; }
+  }
+
+  /* ── Unit block shared ── */
+  .unit-block {
+    display: flex; flex-direction: column; align-items: center; gap: .3rem;
+    background: rgba(26,10,16,.5); border: 1px solid rgba(196,82,106,.18);
+    border-radius: 1rem; padding: 1.4rem .5rem 1.1rem;
+    position: relative; overflow: hidden; transition: border-color .3s;
+  }
+  .unit-block::before {
+    content:''; position:absolute; inset:0;
+    background: linear-gradient(180deg,rgba(196,82,106,.06) 0%,transparent 60%);
+    pointer-events:none;
+  }
+  .unit-block:hover { border-color: rgba(196,82,106,.45); }
+
+  /* Featured (Years) */
+  .unit-block.featured {
+    border-color: rgba(201,149,108,.35);
+    background: rgba(45,21,32,.7);
+  }
+  .unit-block.featured::before {
+    background: linear-gradient(180deg,rgba(201,149,108,.08) 0%,transparent 60%);
+  }
+  .unit-block.featured .unit-num { color: var(--gold); }
+  .unit-block.featured .unit-label { color: var(--gold); opacity: .7; }
+
+  .unit-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 600; color: var(--petal);
+    line-height: 1; min-width: 2ch; text-align: center;
+    transition: color .2s;
+  }
+  .unit-num.tick { color: var(--blush); }
+  .unit-label {
+    font-size: .62rem; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--muted); font-weight: 500;
+  }
+
+  /* Seconds spotlight */
+  .seconds-block { border-color: rgba(196,82,106,.35); }
+  .seconds-block .unit-num { color: var(--rose); font-size: clamp(2.2rem, 5.5vw, 3.4rem); }
+
+  /* Total row blocks */
+  .total-block .unit-num { font-size: clamp(1.35rem, 3.5vw, 2.1rem); }
+  .total-block { background: rgba(45,21,32,.6); border-color: rgba(201,149,108,.15); }
+  .total-block .unit-label { color: rgba(201,149,108,.6); }
+  .total-block.seconds-block .unit-num { font-size: clamp(1.35rem, 3.5vw, 2.1rem); }
+
+  /* Row separator label */
+  .row-label {
+    width: 100%;
+    display: flex; align-items: center; gap: .75rem;
+    font-size: .63rem; letter-spacing: .2em; text-transform: uppercase; color: var(--muted);
+  }
+  .row-label::before, .row-label::after {
+    content: ''; flex: 1; height: 1px; background: rgba(196,82,106,.18);
+  }
+
+  /* ── Live time line ── */
+  .live-time-line {
+    width: 100%;
+    text-align: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1rem, 3vw, 1.25rem);
+    font-style: italic;
+    color: var(--blush);
+    letter-spacing: .04em;
+  }
+  .live-time-line strong { font-style: normal; color: var(--petal); font-weight: 600; }
+
+  /* ── Quote band ── */
+  .quote-band {
+    width: 100%;
+    border-top: 1px solid rgba(196,82,106,.18); border-bottom: 1px solid rgba(196,82,106,.18);
+    padding: 1.2rem 0; text-align: center; overflow: hidden;
+  }
+  .quote-text {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 1.05rem; color: var(--blush);
+    opacity: 0; transform: translateY(6px);
+    transition: opacity .6s ease, transform .6s ease;
+  }
+  .quote-text.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── Secondary stats ── */
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; width: 100%;
+  }
+  @media (max-width: 480px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
+
+  .stat-pill {
+    background: rgba(45,21,32,.7); border: 1px solid rgba(196,82,106,.15);
+    border-radius: .85rem; padding: 1rem .85rem;
+    display: flex; flex-direction: column; gap: .25rem;
+    transition: border-color .3s, transform .2s;
+  }
+  .stat-pill:hover { border-color: rgba(201,149,108,.4); transform: translateY(-2px); }
+  .stat-icon { font-size: 1.1rem; }
+  .stat-val { font-family: 'Cormorant Garamond', serif; font-size: 1.45rem; font-weight: 600; color: var(--petal); line-height: 1; }
+  .stat-desc { font-size: .7rem; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+
+  /* ── Milestones ── */
+  .milestone-section { width: 100%; display: flex; flex-direction: column; gap: 1rem; }
+  .section-eyebrow { font-size: .7rem; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); text-align: center; }
+  .milestones { display: flex; flex-direction: column; gap: .55rem; }
+
+  .milestone {
+    display: flex; align-items: center; gap: 1rem;
+    background: rgba(45,21,32,.5); border: 1px solid rgba(196,82,106,.12);
+    border-radius: .75rem; padding: .75rem 1rem; transition: border-color .3s;
+  }
+  .milestone.reached { border-color: rgba(196,82,106,.35); background: rgba(196,82,106,.07); }
+  .milestone.reached .ms-icon { filter: none; }
+  .ms-icon { font-size: 1.1rem; flex-shrink: 0; filter: grayscale(1) opacity(.4); transition: filter .3s; }
+  .ms-info { flex: 1; }
+  .ms-name { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--petal); }
+  .ms-sub { font-size: .7rem; color: var(--muted); }
+  .ms-bar-wrap { width: 90px; height: 4px; background: rgba(196,82,106,.15); border-radius: 4px; overflow: hidden; flex-shrink: 0; }
+  .ms-bar { height: 100%; background: linear-gradient(90deg, var(--rose), var(--gold)); border-radius: 4px; transition: width 1.2s cubic-bezier(.25,.46,.45,.94); }
+  .ms-check { font-size: .85rem; flex-shrink: 0; width: 22px; text-align: center; }
+
+  /* ── Footer ── */
+  footer { text-align: center; font-size: .72rem; color: rgba(138,90,104,.5); letter-spacing: .06em; }
+  footer strong { color: var(--rose); font-weight: 400; }
+
+  /* ── Nav Link ── */
+  .nav-link {
+    display: inline-flex; align-items: center; gap: .55rem;
+    text-decoration: none;
+    background: linear-gradient(135deg, rgba(196,82,106,.18), rgba(201,149,108,.12));
+    border: 1px solid rgba(196,82,106,.4);
+    border-radius: 999px;
+    padding: .55rem 1.4rem;
+    font-size: .82rem; font-family: 'DM Sans', sans-serif;
+    color: var(--blush); letter-spacing: .06em;
+    transition: background .3s, border-color .3s, transform .2s, box-shadow .3s;
+    box-shadow: 0 4px 18px rgba(196,82,106,.1);
+  }
+  .nav-link:hover {
+    background: linear-gradient(135deg, rgba(196,82,106,.28), rgba(201,149,108,.2));
+    border-color: rgba(201,149,108,.65);
+    color: var(--petal);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(196,82,106,.22);
+  }
+  .nav-link .nav-arrow {
+    font-size: .75rem; transition: transform .2s;
+  }
+  .nav-link:hover .nav-arrow { transform: translateX(3px); }
+</style>
+</head>
+<body>
+
+<div id="particles"></div>
+
+<div class="page">
+
+  <header>
+    <p class="eyebrow">A moment frozen in time</p>
+    <h1 class="title">Our <em>Love</em> Story</h1>
+    <p class="subtitle">Every second, a gift. Every moment, ours.</p>
+    <div class="heart-divider"><span class="hd-icon">♡</span></div>
+    <div class="start-badge">
+      ♡ Started on <span>7 February 2024 &nbsp;·&nbsp; 6:34 PM</span>
+    </div>
+    <a href="subsite/index.html" class="nav-link">
+      📅 &nbsp;Our Love Calendar <span class="nav-arrow">→</span>
+    </a>
+  </header>
+
+  <div class="counter-card">
+
+    <!-- Live sentence -->
+    <div class="live-time-line" id="live-sentence">—</div>
+
+    <!-- Row 1: Years · Months · Days -->
+    <div class="row-label">Date</div>
+    <div class="top-row">
+      <div class="unit-block featured">
+        <div class="unit-num" id="yrs">0</div>
+        <div class="unit-label">Years</div>
+      </div>
+      <div class="unit-block">
+        <div class="unit-num" id="mos">0</div>
+        <div class="unit-label">Months</div>
+      </div>
+      <div class="unit-block">
+        <div class="unit-num" id="dys">0</div>
+        <div class="unit-label">Days</div>
+      </div>
+    </div>
+
+    <!-- Row 2: Hours · Minutes · Seconds -->
+    <div class="row-label">Time</div>
+    <div class="mid-row">
+      <div class="unit-block">
+        <div class="unit-num" id="hrs">0</div>
+        <div class="unit-label">Hours</div>
+      </div>
+      <div class="unit-block">
+        <div class="unit-num" id="mns">0</div>
+        <div class="unit-label">Minutes</div>
+      </div>
+      <div class="unit-block seconds-block">
+        <div class="unit-num" id="scs">0</div>
+        <div class="unit-label">Seconds</div>
+      </div>
+    </div>
+
+    <!-- Row 3: Total Days · Hours · Minutes · Seconds -->
+    <div class="row-label">Total Since Beginning</div>
+    <div class="bottom-row">
+      <div class="unit-block total-block">
+        <div class="unit-num" id="tot-days">0</div>
+        <div class="unit-label">Days</div>
+      </div>
+      <div class="unit-block total-block">
+        <div class="unit-num" id="tot-hrs">0</div>
+        <div class="unit-label">Hours</div>
+      </div>
+      <div class="unit-block total-block">
+        <div class="unit-num" id="tot-mns">0</div>
+        <div class="unit-label">Minutes</div>
+      </div>
+      <div class="unit-block total-block seconds-block">
+        <div class="unit-num" id="tot-scs">0</div>
+        <div class="unit-label">Seconds</div>
+      </div>
+    </div>
+
+    <!-- Quote -->
+    <div class="quote-band">
+      <p class="quote-text" id="quote"></p>
+    </div>
+
+    <!-- Secondary stats -->
+    <div class="stats-grid">
+      <div class="stat-pill">
+        <div class="stat-icon">🌙</div>
+        <div class="stat-val" id="weeks">—</div>
+        <div class="stat-desc">Total Weeks</div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-icon">💫</div>
+        <div class="stat-val" id="total-hours">—</div>
+        <div class="stat-desc">Total Hours</div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-icon">💗</div>
+        <div class="stat-val" id="heartbeats">—</div>
+        <div class="stat-desc">Heartbeats*</div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-icon">🌹</div>
+        <div class="stat-val" id="total-min">—</div>
+        <div class="stat-desc">Total Minutes</div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-icon">✨</div>
+        <div class="stat-val" id="total-sec">—</div>
+        <div class="stat-desc">Total Seconds</div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-icon">🌸</div>
+        <div class="stat-val" id="total-days">—</div>
+        <div class="stat-desc">Total Days</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Milestones -->
+  <div class="milestone-section">
+    <p class="section-eyebrow">Milestones of Love</p>
+    <div class="milestones" id="milestones"></div>
+  </div>
+
+  <footer>
+    <p>*Estimated at ~72 beats/min combined &nbsp;·&nbsp; Updated live every second</p>
+    <p style="margin-top:.4rem">Made with <strong>♡</strong> for every second you share</p>
+  </footer>
+
+</div>
+
+<script>
+  // ── Config ───────────────────────────────────────────────
+  const START = new Date('2024-02-07T18:34:00');
+
+  const QUOTES = [
+    "In all the world, there is no heart for me like yours.",
+    "Every second with you is a lifetime of happiness.",
+    "You are my today and all of my tomorrows.",
+    "I love you more than all the stars in the sky.",
+    "Time stands still best in moments that look suspiciously like ordinary life.",
+    "With you, every moment is a memory I cherish forever.",
+    "The best thing to hold onto in life is each other.",
+    "You are the poem I never knew how to write.",
+    "My favorite place in all the world is next to you.",
+    "Every love story is beautiful, but ours is my favorite.",
+  ];
+
+  const MILESTONES = [
+    { label: '100 Days',  days: 100,  icon: '🌷' },
+    { label: '6 Months',  days: 183,  icon: '🌹' },
+    { label: '1 Year',    days: 366,  icon: '💍' },
+    { label: '500 Days',  days: 500,  icon: '✨' },
+    { label: '18 Months', days: 548,  icon: '🥂' },
+    { label: '2 Years',   days: 731,  icon: '💎' },
+    { label: '1000 Days', days: 1000, icon: '🏆' },
+    { label: '3 Years',   days: 1096, icon: '🌟' },
+  ];
+
+  // ── Particles ─────────────────────────────────────────────
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 28; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 5 + 2;
+    const tx = (Math.random() - .5) * 120;
+    p.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;--d:${Math.random()*14+10}s;--delay:${Math.random()*-20}s;--tx:${tx}px;`;
+    container.appendChild(p);
+  }
+
+  // ── Quote rotator ─────────────────────────────────────────
+  const quoteEl = document.getElementById('quote');
+  let qi = Math.floor(Math.random() * QUOTES.length);
+  function showQuote() {
+    quoteEl.classList.remove('visible');
+    setTimeout(() => {
+      quoteEl.textContent = QUOTES[qi % QUOTES.length];
+      quoteEl.classList.add('visible');
+      qi++;
+    }, 400);
+  }
+  showQuote();
+  setInterval(showQuote, 8000);
+
+  // ── Build milestones ──────────────────────────────────────
+  const msWrap = document.getElementById('milestones');
+  MILESTONES.forEach(ms => {
+    const el = document.createElement('div');
+    el.className = 'milestone';
+    el.dataset.days = ms.days;
+    el.innerHTML = `
+      <span class="ms-icon">${ms.icon}</span>
+      <div class="ms-info">
+        <div class="ms-name">${ms.label}</div>
+        <div class="ms-sub" id="ms-sub-${ms.days}">—</div>
+      </div>
+      <div class="ms-bar-wrap"><div class="ms-bar" id="ms-bar-${ms.days}" style="width:0%"></div></div>
+      <span class="ms-check" id="ms-chk-${ms.days}"></span>
+    `;
+    msWrap.appendChild(el);
+  });
+
+  // ── Helpers ───────────────────────────────────────────────
+  function fmt(n) {
+    if (n >= 1_000_000) return (n / 1_000_000).toFixed(2) + 'M';
+    if (n >= 1_000)     return (n / 1_000).toFixed(1) + 'K';
+    return n.toLocaleString();
+  }
+  function pad2(n) { return String(n).padStart(2, '0'); }
+
+  /**
+   * Exact calendar diff: returns { years, months, days }
+   * using actual calendar arithmetic (not fixed day-lengths).
+   */
+  function calendarDiff(from, to) {
+    let years  = to.getFullYear() - from.getFullYear();
+    let months = to.getMonth()    - from.getMonth();
+    let days   = to.getDate()     - from.getDate();
+
+    if (days < 0) {
+      months--;
+      // Days in the previous month of `to`
+      const prevMonth = new Date(to.getFullYear(), to.getMonth(), 0);
+      days += prevMonth.getDate();
+    }
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+    return { years, months, days };
+  }
+
+  // ── Tick ──────────────────────────────────────────────────
+  const scsEl  = document.getElementById('scs');
+  let lastSec  = -1;
+
+  function tick() {
+    const now    = new Date();
+    const diff   = now - START;               // ms total
+
+    // ── Calendar-accurate years / months / remaining days ──
+    const { years, months, days } = calendarDiff(START, now);
+
+    // ── Time components within the current day ──
+    const hrs = Math.floor((diff % 86400000) / 3600000);
+    const mns = Math.floor((diff % 3600000)  / 60000);
+    const scs = Math.floor((diff % 60000)    / 1000);
+
+    // ── Total counts ──
+    const totDays = Math.floor(diff / 86400000);
+    const totSec  = Math.floor(diff / 1000);
+    const totMin  = Math.floor(diff / 60000);
+    const totHrs  = Math.floor(diff / 3600000);
+    const totWks  = Math.floor(totDays / 7);
+    const beats   = Math.floor(totSec * 2.4);
+
+    // ── Update primary units ──
+    document.getElementById('yrs').textContent = years;
+    document.getElementById('mos').textContent = months;
+    document.getElementById('dys').textContent = days;
+    document.getElementById('hrs').textContent = pad2(hrs);
+    document.getElementById('mns').textContent = pad2(mns);
+
+    if (scs !== lastSec) {
+      scsEl.textContent = pad2(scs);
+      scsEl.classList.add('tick');
+      setTimeout(() => scsEl.classList.remove('tick'), 250);
+      lastSec = scs;
+    }
+
+    // ── Live sentence ──
+    const parts = [];
+    if (years)  parts.push(`${years} year${years !== 1 ? 's' : ''}`);
+    if (months) parts.push(`${months} month${months !== 1 ? 's' : ''}`);
+    if (days)   parts.push(`${days} day${days !== 1 ? 's' : ''}`);
+    const timePart = `${pad2(hrs)}h ${pad2(mns)}m ${pad2(scs)}s`;
+    document.getElementById('live-sentence').innerHTML =
+      `Together for <strong>${parts.join(', ')}</strong> &amp; <strong>${timePart}</strong>`;
+
+    // ── Total row (Days · Hours · Minutes · Seconds since start) ──
+    document.getElementById('tot-days').textContent = totDays.toLocaleString();
+    document.getElementById('tot-hrs').textContent  = totHrs.toLocaleString();
+    document.getElementById('tot-mns').textContent  = fmt(totMin);
+    document.getElementById('tot-scs').textContent  = fmt(totSec);
+
+    // ── Secondary stats ──
+    document.getElementById('weeks').textContent       = totWks.toLocaleString();
+    document.getElementById('total-hours').textContent = totHrs.toLocaleString();
+    document.getElementById('heartbeats').textContent  = fmt(beats);
+    document.getElementById('total-min').textContent   = fmt(totMin);
+    document.getElementById('total-sec').textContent   = fmt(totSec);
+    document.getElementById('total-days').textContent  = totDays.toLocaleString();
+
+    // ── Milestones ──
+    MILESTONES.forEach(ms => {
+      const barEl = document.getElementById('ms-bar-' + ms.days);
+      const chkEl = document.getElementById('ms-chk-' + ms.days);
+      const subEl = document.getElementById('ms-sub-' + ms.days);
+      const card  = document.querySelector(`.milestone[data-days="${ms.days}"]`);
+
+      const pct = Math.min((totDays / ms.days) * 100, 100);
+      barEl.style.width = pct + '%';
+
+      if (totDays >= ms.days) {
+        card.classList.add('reached');
+        chkEl.textContent = '✓';
+        const ago = totDays - ms.days;
+        subEl.textContent = ago === 0 ? '🎉 Today!' : `${ago.toLocaleString()} days ago`;
+      } else {
+        card.classList.remove('reached');
+        chkEl.textContent = '';
+        subEl.textContent = `${(ms.days - totDays).toLocaleString()} days to go`;
+      }
+    });
+  }
+
+  tick();
+  setInterval(tick, 1000);
+</script>
+</body>
+</html>
